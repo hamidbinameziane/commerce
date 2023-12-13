@@ -10,9 +10,11 @@
 
     <form action="{% url 'create' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {% for field in form %}
         <div class="form-group">
-            {{form}}
+            {{field}}
         </div>
+        {% endfor %}
         <div class="form-group">
             <input class="form-control" autofocus type="text" name="title" placeholder="Title">
         </div>

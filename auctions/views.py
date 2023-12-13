@@ -9,10 +9,30 @@ from django import forms
 from .models import User, Listing
 
 class UploadImage(ModelForm):
-    product_image = forms.ImageField()
     class Meta:
         model = Listing
-        fields = ['product_image', 'product_name', 'description', 'starting_bid']
+        fields = ['product_name', 'description', 'starting_bid', 'product_image']
+        labels = {
+            "description": "",
+            "starting_bid": "",
+            "product_name": "",
+            "product_image": "",
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'class': "form-control",
+                }),
+            'starting_bid': forms.NumberInput(attrs={
+                'class': "form-control",
+                }),
+            'product_name': forms.TextInput(attrs={
+                'class': "form-control",
+                }),
+            'product_image': forms.FileInput(attrs={
+                'class': "btn",
+                }),
+            
+        }
 
 
 
