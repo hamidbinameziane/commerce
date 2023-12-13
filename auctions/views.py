@@ -3,8 +3,17 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.forms import ModelForm
+from django import forms
 
 from .models import User, Listing
+
+class UploadImage(ModelForm):
+    product_image = forms.ImageField()
+    class Meta:
+        model = Listing
+        fields = ['product_image', 'product_name', 'description']
+
 
 
 def index(request):
@@ -64,5 +73,10 @@ def register(request):
 
 
 def create(request):
-        image = Listing.objects.get(pk=1)
-        return render(request, "auctions/create.html", {'image': image})
+        if request.POST:
+            frm = UploadImage(request.POST, request.FILES)
+            if frm.is_valid():
+                newlisting = frm.save(commit=False)
+                newlisting.seller = request.user
+                newlisting.save()
+        return render(request, "auctions/create.html", {'form': UploadImage()})
