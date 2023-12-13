@@ -12,7 +12,7 @@ class UploadImage(ModelForm):
     product_image = forms.ImageField()
     class Meta:
         model = Listing
-        fields = ['product_image', 'product_name', 'description']
+        fields = ['product_image', 'product_name', 'description', 'starting_bid']
 
 
 
