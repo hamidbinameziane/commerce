@@ -21,12 +21,17 @@ class UploadImage(ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={
                 'class': "form-control",
+                'placeholder': "Enter description here...",
+                'rows':"4" 
                 }),
             'starting_bid': forms.NumberInput(attrs={
                 'class': "form-control",
+                'placeholder': "Starting Bid",
+                'min':"0"
                 }),
             'product_name': forms.TextInput(attrs={
                 'class': "form-control",
+                'placeholder': "Title"
                 }),
             'product_image': forms.FileInput(attrs={
                 'class': "btn",
