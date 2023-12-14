@@ -5,3 +5,12 @@ body {
 #col:hover {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.50);
 }
+
+#watchlist {
+    height: 40px;
+    width: 100px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
