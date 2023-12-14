@@ -8,6 +8,7 @@ from django import forms
 
 from .models import User, Listing
 import datetime
+from django.contrib.auth.decorators import login_required
 
 class UploadImage(ModelForm):
     class Meta:
@@ -98,6 +99,7 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required
 def create(request):
         if request.POST:
             frm = UploadImage(request.POST, request.FILES)
