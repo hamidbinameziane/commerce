@@ -5,16 +5,16 @@
     <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col" style="padding: 25px;">
             <div class="card h-100">
-                <div>
-                    <button type="button" class="btn btn-primary custom__button" id="watchlist">Watchlist</button>
-                    <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
-                </div>
+                <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
                 <div class="card-body">
                     <h6 class="card-title">Price: ${{ listing.starting_bid }}</h6>
                     <p class="card-text">Description: {{ listing.description }}</p>
                 </div>
                 <div class="card-footer">
                     <small class="text-body-secondary">Created: {{ listing.date_created }}</small>
+                {% if user.is_authenticated %}
+                    <button type="button" class="btn btn-primary custom__button" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">Watchlist</button>
+                {% endif %}
                 </div>
             </div>
         </div>

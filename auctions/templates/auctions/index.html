@@ -4,7 +4,7 @@
     <h2>Active Listings</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for listing in listings %}
-            <div class="col" id="col" style="padding: 25px;" onclick="location.href='{{listing.id}}';">
+            <div class="col" id="col" style="padding: 25px;" onclick="location.href='{{listing.id}}'">
                 <div class="card h-100">
                     <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
                     <div class="card-body">
