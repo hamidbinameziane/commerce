@@ -4,10 +4,6 @@
 
     <h2>Create Listing</h2>
 
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
-
     <form action="{% url 'create' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
@@ -16,8 +12,12 @@
         </div>
         {% endfor %}
         <div class="form-group">
+            <label for="id_product_image" class="form-control">
+             Choose Image
+            </label>
              <img id="your_image" width="40%"/>
         </div>
+        
         <input class="btn btn-primary" type="submit">
     </form>
     <script>

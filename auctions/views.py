@@ -35,7 +35,7 @@ class UploadImage(ModelForm):
                 'placeholder': "Title"
                 }),
             'product_image': forms.FileInput(attrs={
-                'class': "btn",
+                'style': "display: none;",
                 }),
             
         }
