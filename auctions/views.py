@@ -111,3 +111,11 @@ def create(request):
                 newlisting.date_created = datetime.datetime.now()
                 newlisting.save()
         return render(request, "auctions/create.html", {'form': UploadImage()})
+
+
+@login_required
+def listing(request, listing_id):
+    lst = Listing.objects.get(id=listing_id)
+    return render(request, "auctions/listing.html", {
+        "listing": lst
+    })
