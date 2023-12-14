@@ -7,6 +7,7 @@ from django.forms import ModelForm
 from django import forms
 
 from .models import User, Listing
+import datetime
 
 class UploadImage(ModelForm):
     class Meta:
@@ -103,5 +104,6 @@ def create(request):
             if frm.is_valid():
                 newlisting = frm.save(commit=False)
                 newlisting.seller = request.user
+                newlisting.date_created = datetime.datetime.now()
                 newlisting.save()
         return render(request, "auctions/create.html", {'form': UploadImage()})
