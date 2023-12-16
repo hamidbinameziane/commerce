@@ -9,7 +9,7 @@ class Listing(models.Model):
     product_image = models.ImageField(upload_to='files/images', blank=True, null=True)
     product_name = models.CharField(max_length=200, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)
-    starting_bid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     date_created = models.DateTimeField(blank=True, null=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -22,3 +22,8 @@ class Comment(models.Model):
     text = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
+class Watchlist(models.Model):
+    product = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    

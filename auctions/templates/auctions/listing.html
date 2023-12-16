@@ -7,16 +7,31 @@
             <div class="card h-100">
                 <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
                 <div class="card-body">
-                    <h6 class="card-title">Price: ${{ listing.starting_bid }}</h6>
+                    <h6 class="card-title">Price: ${{ listing.price }}</h6>
                     <p class="card-text">Description: {{ listing.description }}</p>
                 </div>
                 <div class="card-footer">
-                    <small class="text-body-secondary">Created: {{ listing.date_created }}</small>
+                    <small class="text-body-secondary">Listed by: {{ listing.seller }}, {{ listing.date_created }}</small>
                 {% if user.is_authenticated %}
-                    <button type="button" class="btn btn-primary custom__button" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">Watchlist</button>
+                    <button type="button" class="btn btn-primary custom__button" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">
+                        {% if is_whatchlist == False %}
+                            Watchlist
+                        {% else %}
+                            Remove
+                        {% endif %} 
+                    </button>
                 {% endif %}
                 </div>
             </div>
+            {% if user.is_authenticated and user != listing.seller %}
+            <form action="{% url 'place_bid' listing.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{form}}
+                </div>           
+                <input class="btn btn-primary" type="submit" value="Place Bid">
+            </form>
+            {% endif %}
         </div>
     </div>
 

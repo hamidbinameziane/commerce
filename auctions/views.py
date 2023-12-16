@@ -6,17 +6,18 @@ from django.urls import reverse
 from django.forms import ModelForm
 from django import forms
 
-from .models import User, Listing
+from .models import User, Listing, Watchlist, Bid
 import datetime
 from django.contrib.auth.decorators import login_required
 
-class UploadImage(ModelForm):
+
+class Create_Listing(ModelForm):
     class Meta:
         model = Listing
-        fields = ['product_name', 'description', 'starting_bid', 'product_image']
+        fields = ['product_name', 'description', 'price', 'product_image']
         labels = {
             "description": "",
-            "starting_bid": "",
+            "price": "",
             "product_name": "",
             "product_image": "",
         }
@@ -26,7 +27,7 @@ class UploadImage(ModelForm):
                 'placeholder': "Enter description here...",
                 'rows':"4" 
                 }),
-            'starting_bid': forms.NumberInput(attrs={
+            'price': forms.NumberInput(attrs={
                 'class': "form-control",
                 'placeholder': "Starting Bid",
                 'min':"0"
@@ -41,6 +42,21 @@ class UploadImage(ModelForm):
             
         }
 
+
+class Place_Bid(ModelForm):
+    class Meta:
+        model = Bid
+        fields = ['amount']
+        labels = {
+            "amount": "",
+        }
+        widgets = {
+            'amount': forms.NumberInput(attrs={
+                'class': "form-control",
+                'placeholder': "Bid",
+                'min':"0"
+                }),            
+        }
 
 
 def index(request):
@@ -104,17 +120,61 @@ def register(request):
 @login_required
 def create(request):
         if request.POST:
-            frm = UploadImage(request.POST, request.FILES)
+            frm = Create_Listing(request.POST, request.FILES)
             if frm.is_valid():
                 newlisting = frm.save(commit=False)
                 newlisting.seller = request.user
                 newlisting.date_created = datetime.datetime.now()
                 newlisting.save()
-        return render(request, "auctions/create.html", {'form': UploadImage()})
+        return render(request, "auctions/create.html", {'form': Create_Listing()})
 
 
 def listing(request, listing_id):
+    prd = Listing.objects.get(pk=listing_id)
+    if Watchlist.objects.filter(product=prd, user=request.user):
+        is_w = True
+    else:
+        is_w = False
     lst = Listing.objects.get(id=listing_id)
     return render(request, "auctions/listing.html", {
-        "listing": lst
+        'form': Place_Bid(),
+        "listing": lst,
+        "is_whatchlist":is_w
     })
+
+@login_required
+def watchlist(request, listing_id):
+    prd = Listing.objects.get(pk=listing_id)   
+    redirect_url = reverse('listing', args=[listing_id])
+
+    if Watchlist.objects.filter(product=prd, user=request.user):
+        Watchlist.objects.filter(product=prd,user=request.user).delete()
+        return HttpResponseRedirect(redirect_url)
+    wtchl = Watchlist(product= prd, user = request.user)
+    wtchl.save()
+    return HttpResponseRedirect(redirect_url)
+    
+@login_required
+def place_bid(request, listing_id):
+    if request.POST:
+            print(Listing.objects.get(pk=listing_id).price)
+            bid = float(request.POST.get('amount'))
+            frm = Place_Bid(request.POST)
+            prd = Listing.objects.get(pk=listing_id)
+            count_bid = Bid.objects.filter(product=prd).count()
+            redirect_url = reverse('listing', args=[listing_id]) 
+            if frm.is_valid():
+                if (count_bid == 0 and bid >= prd.price) or (count_bid > 0 and bid > prd.price):
+                    new_bid = frm.save(commit=False)
+                    new_bid.bidder = request.user
+                    new_bid.product = prd
+                    new_bid.save()
+                    new_p = Listing.objects.get(pk=listing_id)
+                    new_p.price = bid
+                    new_p.save()
+
+
+            return HttpResponseRedirect(redirect_url)
+
+
+
