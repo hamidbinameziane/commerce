@@ -54,7 +54,8 @@ class Place_Bid(ModelForm):
             'amount': forms.NumberInput(attrs={
                 'class': "form-control",
                 'placeholder': "Bid",
-                'min':"0"
+                'min':"0",
+                'style':"margin-top:20px;"
                 }),            
         }
 
@@ -136,6 +137,35 @@ def listing(request, listing_id):
     else:
         is_w = False
     lst = Listing.objects.get(id=listing_id)
+    if request.POST:
+        bid = float(request.POST.get('amount'))
+        frm = Place_Bid(request.POST)
+        prd = Listing.objects.get(pk=listing_id)
+        count_bid = Bid.objects.filter(product=prd).count()
+        redirect_url = reverse('listing', args=[listing_id]) 
+        if frm.is_valid():
+            if (count_bid == 0 and bid >= prd.price) or (count_bid > 0 and bid > prd.price):
+                new_bid = frm.save(commit=False)
+                new_bid.bidder = request.user
+                new_bid.product = prd
+                new_bid.save()
+                new_p = Listing.objects.get(pk=listing_id)
+                new_p.price = bid
+                new_p.save()
+                lst = Listing.objects.get(id=listing_id)        
+                return render(request, "auctions/listing.html", {
+                    'form': Place_Bid(),
+                    "listing": lst,
+                    "is_whatchlist":is_w
+        })
+            else:
+                return render(request, "auctions/listing.html", {
+                        'form': Place_Bid(),
+                        "listing": lst,
+                        "is_whatchlist":is_w,
+                        'message':'The amount you offer is low.'
+            })
+
     return render(request, "auctions/listing.html", {
         'form': Place_Bid(),
         "listing": lst,
@@ -153,11 +183,10 @@ def watchlist(request, listing_id):
     wtchl = Watchlist(product= prd, user = request.user)
     wtchl.save()
     return HttpResponseRedirect(redirect_url)
-    
+'''    
 @login_required
 def place_bid(request, listing_id):
     if request.POST:
-            print(Listing.objects.get(pk=listing_id).price)
             bid = float(request.POST.get('amount'))
             frm = Place_Bid(request.POST)
             prd = Listing.objects.get(pk=listing_id)
@@ -175,6 +204,6 @@ def place_bid(request, listing_id):
 
 
             return HttpResponseRedirect(redirect_url)
-
+'''
 
 

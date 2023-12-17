@@ -24,13 +24,16 @@
                 </div>
             </div>
             {% if user.is_authenticated and user != listing.seller %}
-            <form action="{% url 'place_bid' listing.id %}" method="post">
+            <form action="{% url 'listing' listing.id %}" method="post">
                 {% csrf_token %}
                 <div class="form-group">
                     {{form}}
                 </div>           
                 <input class="btn btn-primary" type="submit" value="Place Bid">
             </form>
+            {% if message %}
+            <p style="color: red;position: absolute;">{{ message }}</p>
+        {% endif %}
             {% endif %}
         </div>
     </div>
