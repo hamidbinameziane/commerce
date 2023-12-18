@@ -133,17 +133,23 @@ def create(request):
 
 def listing(request, listing_id):
     prd = Listing.objects.get(pk=listing_id)
-    if Watchlist.objects.filter(product=prd, user=request.user):
-        is_w = True
-    else:
-        is_w = False
     lst = Listing.objects.get(id=listing_id)
+    if request.user.is_authenticated:
+        if Watchlist.objects.filter(product=prd, user=request.user):
+            is_w = True
+        else:
+            is_w = False
+    else:
+        return render(request, "auctions/listing.html", {
+            'form': Place_Bid(),
+            "listing": lst,
+        })
+    
     if request.POST:
         bid = float(request.POST.get('amount'))
         frm = Place_Bid(request.POST)
         prd = Listing.objects.get(pk=listing_id)
         count_bid = Bid.objects.filter(product=prd).count()
-        redirect_url = reverse('listing', args=[listing_id]) 
         if frm.is_valid():
             if (count_bid == 0 and bid >= prd.price) or (count_bid > 0 and bid > prd.price):
                 new_bid = frm.save(commit=False)
@@ -190,7 +196,6 @@ def close_bid(request, listing_id):
     lst = Listing.objects.get(pk=listing_id)
     prc = lst.price
     h_bid = Bid.objects.get(amount=prc, product=lst).bidder
-    print(h_bid)
     wnr = h_bid
     lst.winner = wnr
     lst.save()
