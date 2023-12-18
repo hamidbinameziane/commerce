@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-footer">
                     <small class="text-body-secondary">Listed by: {{ listing.seller }}, {{ listing.date_created }}</small>
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and listing.winner == None %}
                     <button type="button" class="btn btn-primary custom__button" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">
                         {% if is_whatchlist == False %}
                             Watchlist
@@ -20,10 +20,8 @@
                             Remove
                         {% endif %} 
                     </button>
-                {% endif %}
                 </div>
-            </div>
-            {% if user.is_authenticated and user != listing.seller %}
+            </div>           
             <form action="{% url 'listing' listing.id %}" method="post">
                 {% csrf_token %}
                 <div class="form-group">
@@ -35,7 +33,16 @@
             <p style="color: red;position: absolute;">{{ message }}</p>
         {% endif %}
             {% endif %}
-        </div>
+        </div> 
+        {% if user.is_authenticated and user == listing.seller and listing.winner == None %}
+                <div class="col" style="padding: 25px;"><button class="btn btn-success" type="button" onclick="location.href='close_bid/{{listing.id}}'">Close </button></div>
+            {% elif listing.winner != None %}
+                <div class="col" style="padding: 25px;"><button class="btn btn-secondary" type="button" >Closed</button></div>
+            {% endif %} 
+        {% if user.is_authenticated and user == listing.winner %}
+        <div class="col" style="padding: 25px;"><button class="btn btn-success" type="button">You won that auction</button></div>
+        {% endif %}
     </div>
+   
 
 {% endblock %}

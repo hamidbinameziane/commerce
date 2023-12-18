@@ -55,6 +55,7 @@ class Place_Bid(ModelForm):
                 'class': "form-control",
                 'placeholder': "Bid",
                 'min':"0",
+                'max':"99999999",
                 'style':"margin-top:20px;"
                 }),            
         }
@@ -183,9 +184,20 @@ def watchlist(request, listing_id):
     wtchl = Watchlist(product= prd, user = request.user)
     wtchl.save()
     return HttpResponseRedirect(redirect_url)
-'''    
+   
 @login_required
-def place_bid(request, listing_id):
+def close_bid(request, listing_id):
+    lst = Listing.objects.get(pk=listing_id)
+    prc = lst.price
+    h_bid = Bid.objects.get(amount=prc, product=lst).bidder
+    print(h_bid)
+    wnr = h_bid
+    lst.winner = wnr
+    lst.save()
+    redirect_url = reverse('listing', args=[listing_id])
+    return HttpResponseRedirect(redirect_url)
+
+    '''
     if request.POST:
             bid = float(request.POST.get('amount'))
             frm = Place_Bid(request.POST)
