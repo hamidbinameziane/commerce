@@ -13,13 +13,11 @@
                 <div class="card-footer">
                     <small class="text-body-secondary">Listed by: {{ listing.seller }}, {{ listing.date_created }}</small>
                 {% if user.is_authenticated and listing.winner == None %}
-                    <button type="button" class="btn btn-primary custom__button" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">
                         {% if is_whatchlist == False %}
-                            Watchlist
+                        <button type="button" class="btn btn-primary" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">WATCHLIST</button>
                         {% else %}
-                            Remove
+                        <button type="button" class="btn btn-secondary" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">WATCHLIST</button>
                         {% endif %} 
-                    </button>
                 </div>
             </div>           
             <form action="{% url 'listing' listing.id %}" method="post">
