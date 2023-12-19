@@ -70,6 +70,7 @@
                
              </div>
             {% endfor %}
+            {% if user.is_authenticated and listing.winner == None %}
              <form action="{% url 'add_comment' listing.id %}" method="post">
                {% csrf_token %}
              <div class="mb-3">
@@ -79,6 +80,8 @@
 
             <input class="btn btn-primary" type="submit" id="comment" value="Add Comment">
             </form>
+            {% endif %} 
+         
          </div>
       </div>
    </div>

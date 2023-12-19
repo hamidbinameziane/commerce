@@ -157,7 +157,7 @@ def listing(request, listing_id):
             is_w = False
     else:
         return render(request, "auctions/listing.html", {
-            'form': Place_Bid(),
+            "comment": cmt,
             "listing": lst,
         })
     
