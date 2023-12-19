@@ -25,6 +25,6 @@ class Comment(models.Model):
     product = models.ForeignKey(Listing, on_delete=models.CASCADE)
 
 class Watchlist(models.Model):
-    product = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    product = models.ForeignKey(Listing,blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     

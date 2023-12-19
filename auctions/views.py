@@ -74,11 +74,22 @@ class Add_Comment(ModelForm):
                 'rows':"4" 
                 }),
         }
+def Count_W(r):
+    count_w = Watchlist.objects.filter(user = r.user).count()
+    return count_w
+    
 
 def index(request):
+    if request.user.is_authenticated:
+        count = Count_W(request)
+        return render(request, "auctions/index.html", {
+            "count":count,
+            "listings": Listing.objects.all()
+        })
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all()
-    })
+            "listings": Listing.objects.all()
+        })    
+    
 
 
 def login_view(request):
@@ -135,15 +146,19 @@ def register(request):
 
 @login_required
 def create(request):
-        if request.POST:
-            frm = Create_Listing(request.POST, request.FILES)
-            now = timezone.now()
-            if frm.is_valid():
-                newlisting = frm.save(commit=False)
-                newlisting.seller = request.user
-                newlisting.date_created = now
-                newlisting.save()
-        return render(request, "auctions/create.html", {'form': Create_Listing()})
+    count = Count_W(request)
+    if request.POST:
+        frm = Create_Listing(request.POST, request.FILES)
+        now = timezone.now()
+        if frm.is_valid():
+            newlisting = frm.save(commit=False)
+            newlisting.seller = request.user
+            newlisting.date_created = now
+            newlisting.save()
+    return render(request, "auctions/create.html", {
+        'form': Create_Listing(),
+        "count": count
+        })
 
 
 def listing(request, listing_id):
@@ -160,7 +175,7 @@ def listing(request, listing_id):
             "comment": cmt,
             "listing": lst,
         })
-    
+    count = Count_W(request)
     if request.POST:
         bid = float(request.POST.get('amount'))
         frm = Place_Bid(request.POST)
@@ -182,6 +197,7 @@ def listing(request, listing_id):
                     "listing": lst,
                     "is_whatchlist":is_w,
                     "comment": cmt,
+                    "count": count
         })
             else:
                 return render(request, "auctions/listing.html", {
@@ -190,7 +206,8 @@ def listing(request, listing_id):
                         "listing": lst,
                         "is_whatchlist":is_w,
                         "comment": cmt,
-                        'message':'The amount you offer is low.'
+                        'message':'The amount you offer is low.',
+                        "count": count
             })
 
     return render(request, "auctions/listing.html", {
@@ -199,6 +216,7 @@ def listing(request, listing_id):
         "listing": lst,
         "is_whatchlist":is_w,
         "comment": cmt,
+        "count": count
     })
 
 @login_required
@@ -241,3 +259,18 @@ def add_comment(request, listing_id):
     redirect_url = reverse('listing', args=[listing_id])
     return HttpResponseRedirect(redirect_url)
 
+@login_required
+def watchlist_page(request):
+    count = Count_W(request)
+    wtl_p = Watchlist.objects.filter(user=request.user)
+    ids=[]
+    for w in wtl_p:
+        ids.append(w.product.id)
+    w_lst = Listing.objects.filter(pk__in=ids)
+    print(w_lst)
+
+
+    return render(request, "auctions/watchlist.html", {
+        "w_list": w_lst,
+        "count": count
+    })

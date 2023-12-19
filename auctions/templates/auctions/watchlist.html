@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for listing in w_list %}
+            <div class="col" id="col" style="padding: 25px;" onclick="location.href='{{listing.id}}'">
+                <div class="card h-100">
+                    <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ listing.product_name }}</h5>
+                        <h6 class="card-title">Price: ${{ listing.price }}</h6>
+                        <p class="card-text">Description: {{ listing.description }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">Created: {{ listing.date_created }}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
