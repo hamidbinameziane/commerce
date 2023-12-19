@@ -6,9 +6,9 @@ from django.urls import reverse
 from django.forms import ModelForm
 from django import forms
 
-from .models import User, Listing, Watchlist, Bid
-import datetime
+from .models import User, Listing, Watchlist, Bid, Comment
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 class Create_Listing(ModelForm):
@@ -60,6 +60,20 @@ class Place_Bid(ModelForm):
                 }),            
         }
 
+class Add_Comment(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        labels = {
+            "text": "",
+        }
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': "form-control",
+                'placeholder': "Write a comment.",
+                'rows':"4" 
+                }),
+        }
 
 def index(request):
     return render(request, "auctions/index.html", {
@@ -123,10 +137,11 @@ def register(request):
 def create(request):
         if request.POST:
             frm = Create_Listing(request.POST, request.FILES)
+            now = timezone.now()
             if frm.is_valid():
                 newlisting = frm.save(commit=False)
                 newlisting.seller = request.user
-                newlisting.date_created = datetime.datetime.now()
+                newlisting.date_created = now
                 newlisting.save()
         return render(request, "auctions/create.html", {'form': Create_Listing()})
 
@@ -134,6 +149,7 @@ def create(request):
 def listing(request, listing_id):
     prd = Listing.objects.get(pk=listing_id)
     lst = Listing.objects.get(id=listing_id)
+    cmt=Comment.objects.filter(product=prd)
     if request.user.is_authenticated:
         if Watchlist.objects.filter(product=prd, user=request.user):
             is_w = True
@@ -162,21 +178,27 @@ def listing(request, listing_id):
                 lst = Listing.objects.get(id=listing_id)        
                 return render(request, "auctions/listing.html", {
                     'form': Place_Bid(),
+                    'form2': Add_Comment(),
                     "listing": lst,
-                    "is_whatchlist":is_w
+                    "is_whatchlist":is_w,
+                    "comment": cmt,
         })
             else:
                 return render(request, "auctions/listing.html", {
                         'form': Place_Bid(),
+                        'form2': Add_Comment(),
                         "listing": lst,
                         "is_whatchlist":is_w,
+                        "comment": cmt,
                         'message':'The amount you offer is low.'
             })
 
     return render(request, "auctions/listing.html", {
         'form': Place_Bid(),
+        'form2': Add_Comment(),
         "listing": lst,
-        "is_whatchlist":is_w
+        "is_whatchlist":is_w,
+        "comment": cmt,
     })
 
 @login_required
@@ -195,32 +217,27 @@ def watchlist(request, listing_id):
 def close_bid(request, listing_id):
     lst = Listing.objects.get(pk=listing_id)
     prc = lst.price
-    h_bid = Bid.objects.get(amount=prc, product=lst).bidder
-    wnr = h_bid
-    lst.winner = wnr
-    lst.save()
+    if Bid.objects.filter(amount=prc, product=lst).exists():
+        h_bid = Bid.objects.get(amount=prc, product=lst).bidder
+        wnr = h_bid
+        lst.winner = wnr
+        lst.save()
+    else:
+        lst.delete()
+        return HttpResponseRedirect(reverse("index"))
     redirect_url = reverse('listing', args=[listing_id])
     return HttpResponseRedirect(redirect_url)
 
-    '''
+@login_required
+def add_comment(request, listing_id):
     if request.POST:
-            bid = float(request.POST.get('amount'))
-            frm = Place_Bid(request.POST)
-            prd = Listing.objects.get(pk=listing_id)
-            count_bid = Bid.objects.filter(product=prd).count()
-            redirect_url = reverse('listing', args=[listing_id]) 
-            if frm.is_valid():
-                if (count_bid == 0 and bid >= prd.price) or (count_bid > 0 and bid > prd.price):
-                    new_bid = frm.save(commit=False)
-                    new_bid.bidder = request.user
-                    new_bid.product = prd
-                    new_bid.save()
-                    new_p = Listing.objects.get(pk=listing_id)
-                    new_p.price = bid
-                    new_p.save()
-
-
-            return HttpResponseRedirect(redirect_url)
-'''
-
+        frm = Add_Comment(request.POST)
+        prd = Listing.objects.get(pk=listing_id)
+        if frm.is_valid():
+            newComment = frm.save(commit=False)
+            newComment.user = request.user
+            newComment.product = prd
+            newComment.save()       
+    redirect_url = reverse('listing', args=[listing_id])
+    return HttpResponseRedirect(redirect_url)
 

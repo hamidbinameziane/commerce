@@ -1,0 +1,56 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}  
+<h2>{{ listing.product_name }}</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col" style="padding: 25px;">
+            <div class="card h-100">
+                <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
+                <div class="card-body">
+                    <h4 class="card-title">Price: ${{ listing.price }}</h4>
+                    <p class="card-text">Description: {{ listing.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-body-secondary">Listed by: {{ listing.seller }}, {{ listing.date_created }}</small>
+                {% if user.is_authenticated and listing.winner == None %}
+                        {% if is_whatchlist == False %}
+                        <button type="button" class="btn btn-primary" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">WATCHLIST</button>
+                        {% else %}
+                        <button type="button" class="btn btn-secondary" id="watchlist" onclick="location.href='watchlist/{{listing.id}}'">WATCHLIST</button>
+                        {% endif %} 
+                </div>
+            </div>           
+            <form action="{% url 'listing' listing.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{form}}
+                </div>           
+                <input class="btn btn-primary" type="submit" value="Place Bid">
+            </form>
+            {% if message %}
+            <p style="color: red;position: absolute;">{{ message }}</p>
+        {% endif %}
+            {% endif %}
+        </div> 
+        {% if user.is_authenticated and user == listing.seller and listing.winner == None %}
+                <div class="col" style="padding: 25px;"><button class="btn btn-success" type="button" onclick="location.href='close_bid/{{listing.id}}'">Close </button></div>
+            {% elif listing.winner != None %}
+                <div class="col" style="padding: 25px;"><button class="btn btn-secondary" type="button" >Closed</button></div>
+            {% endif %} 
+        {% if user.is_authenticated and user == listing.winner %}
+        <div class="col" style="padding: 25px;"><button class="btn btn-success" type="button">You won that auction</button></div>
+        {% endif %}
+    </div>
+    <div class="col">
+        <div class="card">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          </div>
+        </div>
+      </div>
+    
+   
+
+{% endblock %}
