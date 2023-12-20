@@ -6,20 +6,24 @@ from django.urls import reverse
 from django.forms import ModelForm
 from django import forms
 
-from .models import User, Listing, Watchlist, Bid, Comment
+from .models import User, Listing, Watchlist, Bid, Comment, Categorie
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+
 
 
 class Create_Listing(ModelForm):
     class Meta:
         model = Listing
-        fields = ['product_name', 'description', 'price', 'product_image']
+        fields = ['product_name', 'product_categorie', 'description', 'price', 'product_image']
+
         labels = {
             "description": "",
             "price": "",
             "product_name": "",
-            "product_image": "",
+            "product_categorie": "",
+            'product_image': "",
+            
         }
         widgets = {
             'description': forms.Textarea(attrs={
@@ -41,6 +45,11 @@ class Create_Listing(ModelForm):
                 }),
             
         }
+    product_categorie = forms.ModelChoiceField(
+        queryset=Categorie.objects.all(),
+        empty_label="Select Categoie",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 
 class Place_Bid(ModelForm):
@@ -74,6 +83,7 @@ class Add_Comment(ModelForm):
                 'rows':"4" 
                 }),
         }
+        
 def Count_W(r):
     count_w = Watchlist.objects.filter(user = r.user).count()
     return count_w
@@ -274,3 +284,6 @@ def watchlist_page(request):
         "w_list": w_lst,
         "count": count
     })
+    
+def categories(request):
+    return render(request, "auctions/categories.html")
