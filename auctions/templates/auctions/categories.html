@@ -1,25 +1,32 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>Categories</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for listing in listings %}
-        {% if listing.winner == None%}
-            <div class="col" id="col" style="padding: 25px;" onclick="location.href='{{listing.id}}'">
-                <div class="card h-100">
-                    <img src="{{ listing.product_image}}" class="card-img-top" alt="No image listed">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ listing.product_name }}</h5>
-                        <h6 class="card-title">Price: ${{ listing.price }}</h6>
-                        <p class="card-text">Description: {{ listing.description }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-body-secondary">Created: {{ listing.date_created }}</small>
-                    </div>
-                </div>
+      {% for key, value in listings.items %}
+      
+      
+      <div class="col">
+        <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+            <h5>{{key}}</h5>
+            {% for v in value %}
+            <div class="carousel-inner"> 
+              
+              <div class="carousel-item{% if forloop.first %} active{% endif %}">
+                
+                <img src="{{ v }}" class="d-block w-100" alt="...">
+               
+              </div>
+             
             </div>
-            {% endif %}
-        {% endfor %}
+            {% endfor %} 
+        </div>
     </div>
+
+   
+    
+    {% endfor %}
+   
+  </div>
 
 {% endblock %}

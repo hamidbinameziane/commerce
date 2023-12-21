@@ -286,4 +286,17 @@ def watchlist_page(request):
     })
     
 def categories(request):
-    return render(request, "auctions/categories.html")
+    d = {}
+    count = Count_W(request)
+    lst = Listing.objects.all().filter(winner=None)
+    catg = Categorie.objects.all()
+    for c in catg:
+        l = []
+        for ls in lst:
+            if c.categorie == ls.product_categorie.categorie:
+                l.append(ls.product_image.url)
+                d[c.categorie] = l
+    return render(request, "auctions/categories.html", {
+            "listings": d,
+            "count":count
+        })
