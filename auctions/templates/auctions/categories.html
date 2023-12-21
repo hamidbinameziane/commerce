@@ -2,13 +2,11 @@
 
 {% block body %}
     <h2>Categories</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      {% for key, value in listings.items %}
-      
-      
-      <div class="col">
+    <div class="row row-cols-1 row-cols-md-3 g-1">
+      {% for key, value in listings.items %}    
+      <div class="col" id="col" style="padding: 25px;" onclick="location.href='{{ key }}'">
         <div class="card">
-        <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+          <div id="carouselExampleSlidesOnly" class="carousel" data-bs-ride="carousel">
             <h5>{{key}}</h5>
             {% for v in value %}
             <div class="carousel-inner"> 
@@ -23,12 +21,7 @@
             {% endfor %} 
           </div>  
         </div>
+      </div>    
+      {% endfor %}  
     </div>
-
-   
-    
-    {% endfor %}
-   
-  </div>
-
 {% endblock %}

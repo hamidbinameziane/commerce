@@ -300,3 +300,13 @@ def categories(request):
             "listings": d,
             "count":count
         })
+    
+def categorie_page(request, c):
+    c_id = Categorie.objects.get(categorie=c)
+    lst = Listing.objects.all().filter(winner=None, product_categorie=c_id)
+    count = Count_W(request)
+    return render(request, "auctions/categorie_page.html", {
+        "listings": lst,
+        "c": c,
+        "count":count
+    })
