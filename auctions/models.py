@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django_resized import ResizedImageField
 
 
 class User(AbstractUser):
@@ -12,7 +13,7 @@ class Categorie(models.Model):
         return self.categorie
 
 class Listing(models.Model):
-    product_image = models.ImageField(upload_to='files/images', blank=True, null=True)
+    product_image = ResizedImageField(size=[500, None], upload_to='files/images', blank=True, null=True)
     product_name = models.CharField(max_length=200, blank=True, null=True)
     product_categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.CASCADE)
     description = models.CharField(max_length=255, blank=True, null=True)
