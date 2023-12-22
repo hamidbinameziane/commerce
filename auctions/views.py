@@ -286,8 +286,7 @@ def watchlist_page(request):
     })
     
 def categories(request):
-    d = {}
-    count = Count_W(request)
+    d = {}   
     lst = Listing.objects.all().filter(winner=None)
     catg = Categorie.objects.all()
     for c in catg:
@@ -296,17 +295,30 @@ def categories(request):
             if c.categorie == ls.product_categorie.categorie:
                 l.append(ls.product_image)
                 d[c.categorie] = l
-    return render(request, "auctions/categories.html", {
-            "listings": d,
-            "count":count
-        })
+    if request.user.is_authenticated:
+        count = Count_W(request)
+        return render(request, "auctions/categories.html", {
+                "listings": d,
+                "count":count
+            })
+    else:
+        return render(request, "auctions/categories.html", {
+                "listings": d,
+            })
+        
     
 def categorie_page(request, c):
     c_id = Categorie.objects.get(categorie=c)
     lst = Listing.objects.all().filter(winner=None, product_categorie=c_id)
-    count = Count_W(request)
-    return render(request, "auctions/categorie_page.html", {
-        "listings": lst,
-        "c": c,
-        "count":count
-    })
+    if request.user.is_authenticated:
+        count = Count_W(request)
+        return render(request, "auctions/categorie_page.html", {
+            "listings": lst,
+            "c": c,
+            "count":count
+        })
+    else:
+       return render(request, "auctions/categorie_page.html", {
+            "listings": lst,
+            "c": c,
+        }) 
